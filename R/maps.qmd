@@ -1,0 +1,62 @@
+---
+title: "Unterkünfte"
+format: html
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+library(dplyr)
+library(ggplot2)
+library(sf)
+library(osmdata)
+```
+
+```{r}
+januar <- readr::read_csv(here::here("data/januar25.csv"))
+januar_sf <- 
+  januar |> 
+  st_as_sf(coords = c("lon", "lat"), crs = st_crs(4326)) # WGS84/GPS
+```
+
+Bounding box für LK KN (Augenmaß):
+
+```{r}
+min_lon <- 8.600639979923342
+min_lat <- 47.63612648028869
+max_lon <- 9.254780064168594
+max_lat <- 47.956540237596265
+
+bbox <- c(min_lon, min_lat, max_lon, max_lat)
+```
+
+Query an OSM, hier Gewässer (Straßen sind als Datensatz zu groß, das muss man irgendwie begrenzen):
+
+```{r}
+water <- 
+  bbox |> 
+  opq() |> 
+  add_osm_feature(key = "natural", value = "water") |> 
+  osmdata_sf()
+
+water <- st_crop(
+  water$osm_multipolygons,
+  xmin = min_lon,
+  xmax = max_lon,
+  ymin = min_lat,
+  ymax = max_lat
+)
+```
+
+Karte:
+
+```{r}
+water |> 
+  ggplot() +
+  geom_sf(fill = "steelblue", color = NA) +
+  geom_sf(data = januar_sf, alpha = .7, aes(size = kapazität, color = art)) +
+  scale_color_manual(values = c("#C370FF", "#6EF07D"))
+```
+
+* Genauer zuschneiden
+* Interaktiv (ggplotly)?

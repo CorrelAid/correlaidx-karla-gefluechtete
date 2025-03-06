@@ -1,0 +1,18 @@
+adresse,lat,lon,art,kapazität,belegung_anfang,zugänge,abgänge,belegung_ende,auslastung_ende
+"Konstanz, Byk-Gulden-Str. 1",47.68162834657486,9.145368063310466,Unterkunft,51,47,0,3,44,86.27
+"Konstanz, Steinstraße 20",47.675939479889486,9.176702378786274,Unterkunft,136,120,2,18,104,76.47
+"Konstanz, Max-Stromeyer-Str. 120",47.67524174492992,9.164915008813773,Unterkunft,57,46,6,2,50,87.72
+"Konstanz, Claude-Dornier-Str. 7W",47.685631907996466,9.13716822443488,Notunterkunft,225,133,8,13,128,56.89
+"Konstanz, Stromeyersdorferstr. 3A",47.67135213191251,9.157946367704898,Unterkunft,90,64,3,4,63,70.00
+"Allensbach, Kaltbrunner Str. 16-18",47.71851597032934,9.07241274626098,Unterkunft,56,53,1,4,50,89.29
+"Gaienhofen, Auf der Breite 3",47.6833725404975,8.98040202245145,Unterkunft,67,64,2,9,57,85.07
+"Stockach, Zoznegger Str. 30",47.85526612051444,9.01673506665057,Unterkunft,160,144,4,8,140,87.50
+"Radolfzell, Kasernenstr. 60-62",47.749556782030716,8.958718852341516,Unterkunft,201,178,13,23,168,83.58
+"Radolfzell, Herrenlandstr. 31",47.74270293870395,8.955967369722009,Notunterkunft,100,72,12,8,76,76.00
+"Engen, Am Bahnhof 4",47.83344410259964,8.768588596645829,Unterkunft,84,60,0,9,51,60.71
+"Engen, Bahnhofstr. 2",47.85494542462862,8.772127892510433,Unterkunft,40,50,1,1,50,125.00
+"Gailingen, Genterweg 3",47.70045307724005,8.747128147294251,Unterkunft,22,9,1,1,9,40.91
+"Singen, Worblinger Str. 11/13",47.75226755118849,8.84317894345158,Unterkunft,82,75,7,7,75,91.46
+"Singen, Güterstr. 1",47.759675163870526,8.852921468554586,Unterkunft,101,77,4,13,68,67.33
+"Gottmadingen, Hardstr. 1-3",47.73458640882023,8.784310963593898,Notunterkunft,200,120,6,17,109,54.50
+"Rielasingen-Worblingen, Roseneggstr. 1",47.73781183884991, 8.840740049155578,Unterkunft,35,1,1,3,9,25.71
