@@ -8,15 +8,14 @@ editor_options:
 ```{r}
 library(dplyr)
 library(ggplot2)
-library(raster)
 library(sf)
 library(showtext)
-library(stars)
 library(osmdata)
 ```
 
 ```{r}
 januar <- readr::read_csv(here::here("data/januar25.csv"))
+
 januar_sf <- 
   januar |> 
   st_as_sf(coords = c("lon", "lat"), crs = st_crs(4326)) # WGS84/GPS
@@ -26,13 +25,6 @@ konstanz <-
   filter(GEN == "Konstanz") |> 
   st_union() |>
   st_transform(crs = st_crs(januar_sf))
-
-# slope <-
-#   read_stars(here::here("data/slope_tm32.tif")) |>
-#   st_transform(crs = st_crs(konstanz))
-# 
-# bbox <- st_bbox(konstanz)
-# slope <- st_crop(slope, bbox)
 ```
 
 Karla-Schriftart registrieren:
@@ -64,11 +56,32 @@ cities <- tribble(
 ) |> st_as_sf(crs = st_crs(4326), coords = c("lon", "lat"))
 ```
 
-Karte:
+Gewässer (query an OSM-API):
+
+```{r}
+water <- 
+  konstanz |> 
+  st_bbox() |> 
+  opq() |> 
+  add_osm_feature(key = "natural", value = "water") |> 
+  osmdata_sf()
+
+water <- st_crop(water$osm_multipolygons, st_bbox(konstanz))
+```
+
+Karten:
 
 ```{r}
 ggplot() +
-  geom_sf(konstanz, mapping = aes(), color = "lightgrey", fill = "#f2f2f2") +
+  geom_sf(water, mapping = aes(), fill = "#f2f2f2", color = NA) +
+  geom_sf(
+    konstanz, 
+    mapping = aes(), 
+    color = "grey50",
+    fill = NA,
+    lty = "dotted",
+    lwd = .5
+  ) +
   geom_sf_text(cities, mapping = aes(label = label), color = "grey50", family = "Bricolage") +
   geom_sf(data = januar_sf, aes(shape = art, color = art), alpha = .8, size = 5) +
   scale_color_manual(values = c("#C370FF", "#6EF07D")) +
@@ -78,7 +91,15 @@ ggplot() +
 
 ```{r}
 ggplot() +
-  geom_sf(konstanz, mapping = aes(), color = "lightgrey", fill = "#f2f2f2") +
+  geom_sf(water, mapping = aes(), fill = "#f2f2f2", color = NA) +
+  geom_sf(
+    konstanz, 
+    mapping = aes(), 
+    color = "grey50",
+    fill = NA,
+    lty = "dotted",
+    lwd = .5
+  ) +
   geom_sf_text(cities, mapping = aes(label = label), color = "grey50", family = "Bricolage") +
   geom_sf(data = januar_sf, aes(color = art, size = kapazität), alpha = .8) +
   scale_color_manual(values = c("#C370FF", "#6EF07D")) +
