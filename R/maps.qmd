@@ -8,7 +8,10 @@ editor_options:
 ```{r}
 library(dplyr)
 library(ggplot2)
+library(raster)
 library(sf)
+library(showtext)
+library(stars)
 library(osmdata)
 ```
 
@@ -17,46 +20,70 @@ januar <- readr::read_csv(here::here("data/januar25.csv"))
 januar_sf <- 
   januar |> 
   st_as_sf(coords = c("lon", "lat"), crs = st_crs(4326)) # WGS84/GPS
+
+konstanz <- 
+  st_read(here::here("data/Shapefile_Zensus2022/EPSG_25832/VG250_KRS.shp")) |> 
+  filter(GEN == "Konstanz") |> 
+  st_union() |>
+  st_transform(crs = st_crs(januar_sf))
+
+# slope <-
+#   read_stars(here::here("data/slope_tm32.tif")) |>
+#   st_transform(crs = st_crs(konstanz))
+# 
+# bbox <- st_bbox(konstanz)
+# slope <- st_crop(slope, bbox)
 ```
 
-Bounding box für LK KN (Augenmaß):
+Karla-Schriftart registrieren:
 
 ```{r}
-min_lon <- 8.600639979923342
-min_lat <- 47.63612648028869
-max_lon <- 9.254780064168594
-max_lat <- 47.956540237596265
-
-bbox <- c(min_lon, min_lat, max_lon, max_lat)
-```
-
-Query an OSM, hier Gewässer (Straßen sind als Datensatz zu groß, das muss man irgendwie begrenzen):
-
-```{r}
-water <- 
-  bbox |> 
-  opq() |> 
-  add_osm_feature(key = "natural", value = "water") |> 
-  osmdata_sf()
-
-water <- st_crop(
-  water$osm_multipolygons,
-  xmin = min_lon,
-  xmax = max_lon,
-  ymin = min_lat,
-  ymax = max_lat
+font_add(
+  family = "Bricolage",
+  regular = here::here("design/BricolageGrotesqueopszwdthwght.ttf")
 )
+
+showtext_auto()
+```
+
+Städte:
+
+```{r}
+cities <- tribble(
+  ~label, ~lat, ~lon,
+  "Konstanz", 47.677326357103446, 9.170532251238933,
+  "Singen", 47.76129263049563, 8.83815307473347,
+  "Allensbach", 47.716948532469445, 9.065928356709662,
+  "Radolfzell", 47.7455977557524, 8.96545274341293,
+  "Ludwigshafen", 47.819830385221884, 9.057934882120135,
+  "Engen", 47.853665264366704, 8.772461727805387,
+  "Stockach", 47.852756660192476, 9.008929353111744,
+  "Gaienhofen", 47.682579551740844, 8.980867417605547,
+  "Gottmadingen", 47.73601074673219, 8.780260010956532,
+  "Gailingen", 47.69673218629311, 8.752901190320555
+) |> st_as_sf(crs = st_crs(4326), coords = c("lon", "lat"))
 ```
 
 Karte:
 
 ```{r}
-water |> 
-  ggplot() +
-  geom_sf(fill = "steelblue", color = NA) +
-  geom_sf(data = januar_sf, alpha = .7, aes(size = kapazität, color = art)) +
-  scale_color_manual(values = c("#C370FF", "#6EF07D"))
+ggplot() +
+  geom_sf(konstanz, mapping = aes(), color = "lightgrey", fill = "#f2f2f2") +
+  geom_sf_text(cities, mapping = aes(label = label), color = "grey50", family = "Bricolage") +
+  geom_sf(data = januar_sf, aes(shape = art, color = art), alpha = .8, size = 5) +
+  scale_color_manual(values = c("#C370FF", "#6EF07D")) +
+  labs(shape = "Art", color = "Art") +
+  theme_void(base_family = "Bricolage", base_size = 18)
 ```
 
-* Genauer zuschneiden
+```{r}
+ggplot() +
+  geom_sf(konstanz, mapping = aes(), color = "lightgrey", fill = "#f2f2f2") +
+  geom_sf_text(cities, mapping = aes(label = label), color = "grey50", family = "Bricolage") +
+  geom_sf(data = januar_sf, aes(color = art, size = kapazität), alpha = .8) +
+  scale_color_manual(values = c("#C370FF", "#6EF07D")) +
+  labs(color = "Art", size = "Kapazität") +
+  theme_void(base_family = "Bricolage", base_size = 18)
+```
+
 * Interaktiv (ggplotly)?
